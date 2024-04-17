@@ -1,0 +1,45 @@
+#!bin/bash/python3
+
+import sys
+import socket
+from datetime import datetime
+
+
+#Define our target
+#Check number of arguments is correct
+if len(sys.argv) == 2:
+	target = socket.gethostbyname(sys.argv[1]) #Translate hostname to ipv4
+else:
+	print("Invalid amount of arguments.")
+	print("Syntax: python3 scanner.py <ip>")
+
+#python3 scanner.py < [0] 192.168.1.1 < [1]
+
+#Add a pretty banner
+print("-" * 50)
+print("Scanning target: " + target)
+print(f"Time started: {str(datetime.now())}")
+print("-" * 50)
+
+
+#Attempt to scan home router
+try:
+	for port in range(50,85):
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		socket.setdefaulttimeout(1) #if no response in 1s, move on
+		result = s.connect_ex((target,port))
+		#if port is open it returns 0, if port is close it returns 1
+		if result == 0:
+			print(f"Port {port} is open")
+		s.close() 
+except KeyboardInterrupt:
+	print("\nExiting program.")
+	sys.exit()
+
+except socket.gaierror:
+	print("hostname could not be resolved.")
+	sys.exit()
+
+except socket.error:
+	print("Could not connect to server.")
+	sys.exit()
